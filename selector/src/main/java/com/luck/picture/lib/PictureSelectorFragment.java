@@ -824,6 +824,14 @@ public class PictureSelectorFragment extends PictureCommonFragment
                 if (DoubleUtils.isFastDoubleClick()) {
                     return;
                 }
+
+                // 添加判断，检查是否已达到选择上限
+                if (selectorConfig.getSelectCount() >= selectorConfig.maxSelectNum) {
+                    // 达到上限时，显示提示信息
+                    showTipsDialog(getString(R.string.ps_message_max_num, selectorConfig.maxSelectNum + ""));
+                    return;
+                }
+
                 openSelectedCamera();
             }
 
@@ -1137,15 +1145,26 @@ public class PictureSelectorFragment extends PictureCommonFragment
             mAdapter.getData().add(0, media);
             isCameraCallback = true;
         }
-        if (selectorConfig.selectionMode == SelectModeConfig.SINGLE && selectorConfig.isDirectReturnSingle) {
-            selectorConfig.selectedResult.clear();
-            int selectResultCode = confirmSelect(media, false);
-            if (selectResultCode == SelectedManager.ADD_SUCCESS) {
-                dispatchTransformResult();
-            }
-        } else {
-            confirmSelect(media, false);
+
+//        // 无论什么模式，都清除之前的结果并添加新拍摄的媒体
+//        selectorConfig.selectedResult.clear();
+        int selectResultCode = confirmSelect(media, false);
+
+        // 无条件直接返回结果
+        if (selectResultCode == SelectedManager.ADD_SUCCESS) {
+            dispatchTransformResult();
+            return; // 提前返回，避免执行后续代码
         }
+
+//        if (selectorConfig.selectionMode == SelectModeConfig.SINGLE && selectorConfig.isDirectReturnSingle) {
+//            selectorConfig.selectedResult.clear();
+//            int selectResultCode = confirmSelect(media, false);
+//            if (selectResultCode == SelectedManager.ADD_SUCCESS) {
+//                dispatchTransformResult();
+//            }
+//        } else {
+//            confirmSelect(media, false);
+//        }
         mAdapter.notifyItemInserted(selectorConfig.isDisplayCamera ? 1 : 0);
         mAdapter.notifyItemRangeChanged(selectorConfig.isDisplayCamera ? 1 : 0, mAdapter.getData().size());
         if (selectorConfig.isOnlySandboxDir) {

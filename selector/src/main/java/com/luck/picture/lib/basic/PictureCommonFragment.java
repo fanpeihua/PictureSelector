@@ -738,7 +738,7 @@ public abstract class PictureCommonFragment extends Fragment implements IPicture
      *
      * @param tips
      */
-    private void showTipsDialog(String tips) {
+    protected void showTipsDialog(String tips) {
         if (ActivityCompatHelper.isDestroy(getActivity())) {
             return;
         }
